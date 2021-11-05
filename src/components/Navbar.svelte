@@ -58,12 +58,14 @@
 </script>
 
 <nav
-  class="container mx-auto px-2 sm:px-6 xl:px-10 2xl:px-40 z-50 min-w-max"
+  class="container mx-auto px-2 sm:px-0 xl:px-10 2xl:px-40 z-50 min-w-max"
   id="navbar"
   use:onload
 >
   <div class="my-5 pt-5">
-    <div class="relative flex items-center justify-between">
+    <div
+      class="relative flex items-center justify-between md:justify-around lg:justify-between"
+    >
       <a class="flex-shrink-0 flex items-center" href="/">
         <img
           class="block h-12 w-auto"
@@ -139,7 +141,7 @@
         </div>
       </div>
       <div
-        class="absolute md:hidden inset-y-0 right-0 flex items-center md:static md:inset-auto md:ml-6 md:pr-0"
+        class="absolute flex md:hidden lg:flex inset-y-0 right-0 items-center lg:static lg:inset-auto lg:ml-6 lg:pr-0"
       >
         <div>
           <a
