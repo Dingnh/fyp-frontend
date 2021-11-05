@@ -1,30 +1,47 @@
 <script>
-	export let name;
+	import Tailwind from "./components/Tailwind.svelte";
+	import { onDestroy } from "svelte";
+	import {
+		Route,
+		params,
+		state,
+		pathname,
+		hideNav,
+		hideFooter,
+	} from "@/components/stores.js";
+	import router from "@/rootRoutes";
+	import Footer from "@/components/Footer.svelte";
+	import Navbar from "@/components/Navbar.svelte";
+	import ScrollToTop from "@/components/ScrollToTop.svelte";
+	import ComingSoonModal from "@/components/ComingSoonModal.svelte";
+	let uri = location.pathname;
+
+	function track(obj) {
+		uri = obj.state || obj.uri || location.pathname;
+		state.update((s) => obj.uri);
+		pathname.update((n) => location.pathname);
+		if (window.ga) ga.send("pageview", { dp: uri });
+	}
+
+	addEventListener("replacestate", track);
+	addEventListener("pushstate", track);
+	addEventListener("popstate", track);
+
+	router.listen();
+
+	onDestroy(router.unlisten);
+	pathname.update((n) => window.location.pathname);
 </script>
 
-<main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
+<Tailwind />
+{#if !$hideNav}
+	<Navbar />
+{/if}
+<main class="container mx-auto px-2 sm:px-6 md:px-0 xl:px-10 2xl:px-40 ">
+	<svelte:component this={$Route} {$params} />
 </main>
-
-<style>
-	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-	}
-
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
-</style>
+<ScrollToTop />
+{#if !$hideFooter}
+	<Footer />
+{/if}
+<ComingSoonModal />

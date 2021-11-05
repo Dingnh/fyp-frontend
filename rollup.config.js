@@ -1,11 +1,21 @@
-import svelte from 'rollup-plugin-svelte';
-import commonjs from '@rollup/plugin-commonjs';
-import resolve from '@rollup/plugin-node-resolve';
-import livereload from 'rollup-plugin-livereload';
-import { terser } from 'rollup-plugin-terser';
-import css from 'rollup-plugin-css-only';
+import svelte from "rollup-plugin-svelte";
+import replace from "@rollup/plugin-replace";
+import resolve from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
+import sveltePreprocess from "svelte-preprocess";
+import { terser } from "rollup-plugin-terser";
+import alias from "@rollup/plugin-alias";
+import path from "path";
+import { generateSW } from "rollup-plugin-workbox";
+import postcss from "rollup-plugin-postcss";
+import livereload from "rollup-plugin-livereload";
+import del from "rollup-plugin-delete";
+import json from '@rollup/plugin-json';
+import builtins from 'rollup-plugin-node-builtins';
+import globals from 'rollup-plugin-node-globals';
 
 const production = !process.env.ROLLUP_WATCH;
+const pwa = !process.env.DISABLE_PWA && production;
 
 function serve() {
 	let server;
@@ -17,60 +27,115 @@ function serve() {
 	return {
 		writeBundle() {
 			if (server) return;
-			server = require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], {
-				stdio: ['ignore', 'inherit', 'inherit'],
-				shell: true
-			});
+			server = require("child_process").spawn(
+				"npm",
+				["run", "start", "--", "--dev"],
+				{
+					stdio: ["ignore", "inherit", "inherit"],
+					shell: true,
+				}
+			);
 
-			process.on('SIGTERM', toExit);
-			process.on('exit', toExit);
-		}
+			process.on("SIGTERM", toExit);
+			process.on("exit", toExit);
+		},
 	};
 }
 
 export default {
-	input: 'src/main.js',
-	output: {
-		sourcemap: true,
-		format: 'iife',
-		name: 'app',
-		file: 'public/build/bundle.js'
-	},
+	input: "src/main.js",
+	output: production
+		? {
+				name: "app",
+				format: "esm",
+				sourcemap: false,
+				dir: "public/build",
+		  }
+		: {
+				name: "app",
+				format: "esm",
+				sourcemap: true,
+				dir: "public/build",
+		  },
+	inlineDynamicImports: !production,
 	plugins: [
+		json(),
+		globals(),
+		builtins(),
 		svelte({
-			compilerOptions: {
-				// enable run-time checks when not in production
-				dev: !production
-			}
+			// enable run-time checks when not in production
+			dev: !production,
+			preprocess: sveltePreprocess({ postcss: true }),
+			// we'll extract any component CSS out into
+			// a separate file — better for performance
 		}),
-		// we'll extract any component CSS out into
-		// a separate file - better for performance
-		css({ output: 'bundle.css' }),
+
+		postcss({
+			extract: true,
+		}),
 
 		// If you have external dependencies installed from
 		// npm, you'll most likely need these plugins. In
-		// some cases you'll need additional configuration -
+		// some cases you'll need additional configuration —
 		// consult the documentation for details:
-		// https://github.com/rollup/plugins/tree/master/packages/commonjs
-		resolve({
-			browser: true,
-			dedupe: ['svelte']
-		}),
+		// https://github.com/rollup/rollup-plugin-commonjs
+		resolve({browser:true}),
 		commonjs(),
 
-		// In dev mode, call `npm run start` once
-		// the bundle has been generated
+		// Watch file changes
 		!production && serve(),
 
 		// Watch the `public` directory and refresh the
 		// browser on changes when not in production
-		!production && livereload('public'),
+		!production && livereload("public"),
+
+		replace({
+			"process.env.NODE_ENV": JSON.stringify(
+				production ? "production" : "development"
+			),
+		}),
 
 		// If we're building for production (npm run build
 		// instead of npm run dev), minify
-		production && terser()
+		production && terser(),
+
+		// ALias
+		alias({
+			entries: [
+				{
+					find: "@",
+					replacement: path.resolve(__dirname, "src/"),
+				},
+			],
+		}),
+
+		// Workbox
+		pwa &&
+			generateSW({
+				swDest: "public/sw.js",
+				globDirectory: "public/",
+				globPatterns: ["**/*.{html,json,js,css}"],
+				skipWaiting: true,
+				clientsClaim: true,
+				sourcemap: false,
+				runtimeCaching: [
+					{
+						urlPattern: /\.(?:png|jpg|jpeg|svg)$/,
+						handler: "CacheFirst",
+						options: {
+							cacheName: "images",
+							expiration: {
+								maxEntries: 10,
+							},
+						},
+					},
+				],
+			}),
+		// Clean up chunk files
+		del({ targets: "public/build/*", hook: "buildEnd", runOnce: true }),
 	],
+
 	watch: {
-		clearScreen: false
-	}
+		clearScreen: false,
+	},
 };

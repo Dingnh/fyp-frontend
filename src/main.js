@@ -1,10 +1,17 @@
+import GAnalytics from 'ganalytics';
 import App from './App.svelte';
+import './main.css'
 
-const app = new App({
-	target: document.body,
-	props: {
-		name: 'world'
-	}
+new App({
+	target: document.body
 });
 
-export default app;
+if (process.env.NODE_ENV === 'production') {
+	window.ga = new GAnalytics('UA-XXXXXXXX-X');
+	if ('serviceWorker' in navigator) {
+		// Use the window load event to keep the page load performant
+		window.addEventListener('load', () => {
+			navigator.serviceWorker.register('/sw.js');
+		});
+	}
+}
