@@ -17,7 +17,7 @@
 <button
   on:click={() => (document.documentElement.scrollTop = 0)}
   class="{show ? 'block' : 'hidden'} fixed bottom-20 right-10
-         xl:right-20 2xl:right-40 bg-facemask-primary hover:bg-facemask-hover-primary z-50 rounded-full text-white"
+         xl:right-20 2xl:right-40 bg-facemask-logoBg hover:bg-facemask-gray-500 z-50 rounded-full text-white"
   style="width: 60px; height: 60px"
   title="Go to top"
 >
