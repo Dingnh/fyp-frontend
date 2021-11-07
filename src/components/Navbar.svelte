@@ -1,43 +1,134 @@
 <script>
   import { comingsoon } from "@/components/stores.js";
+  import Modal from "./Modal.svelte";
   import SideNav from "./SideNav.svelte";
+  import { LottiePlayer } from "@lottiefiles/svelte-lottie-player";
 
   let sidebar_show = false;
 
   let showMore = false;
   let showMobileMenu = false;
 
+  let modalOpen = false;
+
+  function openModal({
+    title = "",
+    description = "",
+    pBtn = () => {},
+    pBtnName = "",
+    cBtn = () => closeModal(),
+    cBtnName = "",
+    animation = {},
+  }) {
+    modalOpen = true;
+    modalInfo.title = title;
+    modalInfo.description = description;
+    modalInfo.pBtn = pBtn;
+    modalInfo.pBtnName = pBtnName;
+    modalInfo.cBtn = cBtn;
+    modalInfo.cBtnName = cBtnName;
+    modalInfo.animation = animation;
+  }
+
+  function closeModal() {
+    modalOpen = false;
+  }
+
+  let modalInfo = {
+    title: "Drop me an email!",
+    description: "18039503@imail.sunway.edu.my",
+    pBtn: () => {},
+    pBtnName: "",
+    cBtnName: "",
+    animation: {
+      src: "",
+      width: 300,
+    },
+  };
+
   let navlinks = [
     {
       id: 2,
+      type: "link",
       title: "Home",
-      path: "/catalogue?page=1",
+      path: "/",
     },
     {
       id: 3,
+      type: "modal",
       title: "Contact Me",
-      path: "/cpos",
+      path: "",
+      onclick: () =>
+        openModal({
+          title: "Drop me an email!",
+          description: "18039503@imail.sunway.edu.my",
+          pBtn: () => {
+            window.location = "18039503@imail.sunway.edu.my";
+          },
+          pBtnName: "Email Me",
+          cBtnName: "",
+          animation: {
+            src: "/animations/email.json",
+            width: 300,
+          },
+        }),
     },
     {
       id: 4,
+      type: "modal",
       title: "About The Project",
-      path: "/about-us",
+      path: "/",
+      onclick: () =>
+        openModal({
+          title: "Download A Copy Of My Report",
+          description: "Capstone Project 1.pdf",
+          pBtn: () => {
+            window.open("/PD_18039503.pdf", "_blank");
+          },
+          pBtnName: "Download",
+          cBtnName: "",
+          animation: {
+            src: "/animations/report.json",
+            width: 300,
+          },
+        }),
     },
     {
       id: 5,
+      type: "modal",
       title: "How It Works",
-      path: "/locate-us",
+      path: "",
+      onclick: () =>
+        openModal({
+          title: "Discover How The Image Classification System Works",
+          description:
+            "Low Light Enhancement and Face Masks Identification Model.pdf",
+          pBtn: () => {
+            window.open(
+              "/Low Light Enhancement and Face Masks Identification Model.pdf",
+              "_blank"
+            );
+          },
+          pBtnName: "Download",
+          cBtnName: "",
+          animation: {
+            src: "/animations/howitworks.json",
+            width: 300,
+          },
+        }),
     },
   ];
 
   let menulinks = [
     {
       id: 2,
+      type: "modal",
       title: "References",
       path: "#",
     },
     {
       id: 5,
+      type: "link",
       title: "Gallery",
       path: "#",
     },
@@ -77,11 +168,20 @@
         <div class="hidden md:flex sm:ml-6 items-center justify-center">
           <div class="flex space-x-5">
             {#each navlinks as navlink}
-              <a
-                href={navlink.path}
-                class="text-facemask-gray-600 dark:text-facemask-gray-200 font-medium px-3 py-2 rounded-md text-sm"
-                >{navlink.title}</a
-              >
+              {#if navlink.type == "link"}
+                <a
+                  href={navlink.path}
+                  class="text-facemask-gray-600 dark:text-facemask-gray-200 font-medium px-3 py-2 rounded-md text-sm"
+                  >{navlink.title}</a
+                >
+              {:else if navlink.type == "modal"}
+                <h1
+                  class="text-facemask-gray-600 dark:text-facemask-gray-200 font-medium px-3 py-2 rounded-md text-sm cursor-pointer"
+                  on:click={navlink.onclick}
+                >
+                  {navlink.title}
+                </h1>
+              {/if}
             {/each}
             <div class="relative inline-block text-left">
               <div>
@@ -166,3 +266,39 @@
 
   <SideNav bind:show={sidebar_show} />
 </nav>
+
+<Modal bind:open={modalOpen} hideHeader hideFooter hideClose
+  ><div
+    slot="body"
+    class="flex flex-col items-center"
+    style="padding: 20px; padding-bottom: 30px; width: 650px"
+  >
+    <LottiePlayer
+      src={modalInfo.animation.src}
+      autoplay={true}
+      renderer="svg"
+      background="transparent"
+      width={modalInfo.animation.width}
+    />
+    <p style="font-weight: 500; font-size: 20px; margin-bottom: 5px">
+      {modalInfo.title}
+    </p>
+    <p style="text-align: center; padding: 0px 20px; margin-bottom: 30px">
+      {modalInfo.description}
+    </p>
+    <div class="flex gap-2">
+      <button
+        class="bg-facemask-gray-400 hover:bg-facemask-gray-500 text-white font-bold py-2 px-4 rounded"
+        on:click={modalInfo.cBtn}
+      >
+        {modalInfo.cBtnName || "Cancel"}
+      </button>
+      <button
+        class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+        on:click={modalInfo.pBtn}
+      >
+        {modalInfo.pBtnName}
+      </button>
+    </div>
+  </div>
+</Modal>
