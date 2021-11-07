@@ -42,7 +42,7 @@
       />
     {/if}
     <div
-      class="fixed inset-0 bg-facemask-gray-500 bg-opacity-75 transition-opacity backdrop-filter backdrop-blur"
+      class="fixed inset-0 bg-facemask-gray-500 bg-opacity-90 transition-opacity"
       aria-hidden="true"
       on:click={dismissModal}
     />
