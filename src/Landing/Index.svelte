@@ -1,6 +1,7 @@
 <script>
   import PreviewModal from "@/components/PreviewModal.svelte";
   import HomePageSkeleton from "./skeletons/HomePageSkeleton.svelte";
+  import FaceMaskSection from "./components/FaceMaskSection.svelte";
 
   let innerWidth = window.innerWidth;
 
@@ -15,10 +16,10 @@
   });
 </script>
 
-<!-- {#await content}
-  <HomePageSkeleton />
+{#await content}
+  <HomePageSkeleton bind:innerWidth />
 {:then { data }}
-  <div class="flex flex-col gap-20 mb-20">Its loaded</div>
-{/await} -->
+  <FaceMaskSection />
+{/await}
 
 <PreviewModal />
