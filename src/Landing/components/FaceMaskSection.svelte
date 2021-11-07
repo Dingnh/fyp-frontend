@@ -20,7 +20,9 @@
         alt="masked-person"
       />
     </div>
-    <div class="w-full md:w-6/12 ml-5 flex flex-col relative h-80 md:h-auto">
+    <div
+      class="w-full md:w-6/12 ml-0 md:ml-5 flex flex-col relative h-80 md:h-auto"
+    >
       <button
         class="rounded-xl p-10 py-5 max-w-none md:max-w-xs border-facemask-gray-400 text-facemask-gray-400"
         style="border: 1px solid;"
