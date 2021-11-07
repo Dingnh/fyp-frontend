@@ -18,7 +18,7 @@
   ];
 </script>
 
-<div class="bg-facemask-gray-100 shadow-facemask-inverted-sm">
+<div class="bg-facemask-gray-100">
   <div
     class="lg:flex w-full pt-12 md:pt-24 container mx-auto px-2 sm:px-6 md:px-0 xl:px-10 2xl:px-40 "
   >
