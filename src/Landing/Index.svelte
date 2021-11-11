@@ -12,7 +12,7 @@
   const content = new Promise((resolve, reject) => {
     setTimeout(() => {
       resolve("foo");
-    }, 3000);
+    }, 1500);
   });
 </script>
 

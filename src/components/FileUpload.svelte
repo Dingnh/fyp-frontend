@@ -1,6 +1,9 @@
 <script>
   import Dropzone from "svelte-file-dropzone";
+  import { createEventDispatcher } from "svelte";
+
   let hover = false;
+  const dispatch = createEventDispatcher();
   // export let files;
 
   export let files = {
@@ -24,6 +27,10 @@
     }
   };
   $: textcolor = hover ? "text-white" : "text-facemask-gray-400";
+
+  function buttonOnclick() {
+    dispatch("buttonclick", {});
+  }
 </script>
 
 <!-- {#if submission_field?.files?.length}
@@ -33,31 +40,57 @@
 {/if} -->
 
 {#if uploadedFiles.length && !reupload}
-  <ul class="mb-5">
-    {#each uploadedFiles as file}
-      <li class="pr-2">
+  <div>
+    <ul class="mb-5">
+      {#each uploadedFiles as file}
+        <li class="pr-2">
+          <div
+            class="pr-2 mb-1"
+            style="display:flex; justify-content: space-between;"
+          >
+            <p class="text-facemask-gray-500" style="margin-bottom: 0px;">
+              {file.name}
+            </p>
+            <i
+              class="bi bi-x"
+              style="cursor: pointer;"
+              on:click={() => {
+                let fileIndex = uploadedFiles.findIndex(
+                  (f) => f.name === file.name
+                );
+                uploadedFiles.splice(fileIndex, 1);
+                uploadedFiles = uploadedFiles;
+              }}
+            />
+          </div>
+        </li>
+      {/each}
+    </ul>
+    <div class="flex flex-col flex-wrap">
+      <div class="flex">
         <div
-          class="pr-2 mb-1"
-          style="display:flex; justify-content: space-between;"
+          style="cursor: pointer; color: #1C93ED"
+          on:click={() => {
+            // if (!submission_field?.files?.length) {
+            // 	uploadedFiles = [];
+            // }
+            removeUpload();
+          }}
         >
-          <p class="text-facemask-gray-500" style="margin-bottom: 0px;">
-            {file.name}
-          </p>
-          <i
-            class="bi bi-x"
-            style="cursor: pointer;"
-            on:click={() => {
-              let fileIndex = uploadedFiles.findIndex(
-                (f) => f.name === file.name
-              );
-              uploadedFiles.splice(fileIndex, 1);
-              uploadedFiles = uploadedFiles;
-            }}
-          />
+          Cancel
         </div>
-      </li>
-    {/each}
-  </ul>
+        <div
+          class="ml-2"
+          style="cursor: pointer; color: #1C93ED;"
+          on:click={() => {
+            reupload = true;
+          }}
+        >
+          Add another file(s)
+        </div>
+      </div>
+    </div>
+  </div>
 {/if}
 {#if !uploadedFiles.length || reupload}
   <Dropzone
@@ -85,29 +118,14 @@
     </h4>
   </Dropzone>
 {:else}
-  <div class="flex flex-col flex-wrap">
-    <div />
-    <div class="flex">
-      <div
-        style="cursor: pointer; color: #1C93ED"
-        on:click={() => {
-          // if (!submission_field?.files?.length) {
-          // 	uploadedFiles = [];
-          // }
-          removeUpload();
-        }}
-      >
-        Cancel
-      </div>
-      <div
-        class="ml-2"
-        style="cursor: pointer; color: #1C93ED;"
-        on:click={() => {
-          reupload = true;
-        }}
-      >
-        Add another file(s)
-      </div>
-    </div>
-  </div>
+  <button
+    on:click={(e) => {
+      buttonOnclick(e);
+      removeUpload();
+    }}
+    class="flex justify-center items-center text-md text-facemask-gray-100 font-medium rounded-lg p-3 mt-6 w-full bg-facemask-gray-500"
+  >
+    <i class="bi bi-upload leading-none mr-2.5 text-xl" />
+    Upload Images
+  </button>
 {/if}
