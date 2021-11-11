@@ -3,7 +3,6 @@
   import models from "@/services/models";
   import Modal from "@/components/Modal.svelte";
   import { LottiePlayer } from "@lottiefiles/svelte-lottie-player";
-  import data from "./data";
 
   let files = {
     accepted: [],
