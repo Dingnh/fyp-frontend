@@ -7,8 +7,11 @@
   export let hideFooter = false;
   export let hideClose = false;
   export let roundedCorner = true;
+  export let closable = true;
   export let dismissModal = () => {
-    open = false;
+    if (closable) {
+      open = false;
+    }
   };
   export let pBtnName = "Deactivate";
   export let pBtnFn = () => {
