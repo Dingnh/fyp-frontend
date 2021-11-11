@@ -47,13 +47,10 @@ export default {
 		return {data, response};
 	},
 
-	async authPostWithFormData({ path = null, url = null, formData }) {
+	async postWithFormData({ path = null, url = null, formData }) {
 		url = url || domain + path;
 		let response = await fetch(url, {
 			method: "POST",
-			headers: {
-				Authorization: `Token ${Cookie.get("token")}`,
-			},
 			body: formData,
 		});
 		let data = await response.json();

@@ -1,24 +1,10 @@
 import Network from "@/services/network";
 
 export default {
-	async getModels({ params = "" }) {
-		return Network.get({ path: "/Models" + `${params}` });
+	async uploadImages({ images }) {
+		var formdata = new FormData();
+		formdata.append("image", images[0], images[0].path);
+		return Network.postWithFormData({ path: "/facemask/detect/", formData:formdata });
 	},
-	async getModel(id) {
-		let res = await Network.get({ path: "/Models" + `/${id}/` });
-		let resModel = res.data;
-		let model = {
-			...resModel,
-			media: resModel.media.map((m) => {
-				return m.url;
-			}),
-		};
-		return {
-			data: model,
-			response: res.response,
-		};
-	},
-	async getModelsCount() {
-		return Network.get("/Models/count");
-	},
-};
+}
+
